@@ -1,7 +1,6 @@
 package org.example.netty.common.handler;
 
-import org.example.netty.common.dto.BasicRequest;
-import org.example.netty.common.dto.BasicResponse;
+import io.netty.channel.ChannelHandlerContext;
 import org.example.netty.common.dto.GetFilesListRequest;
 import org.example.netty.common.dto.GetFilesListResponse;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class GetFilesListHandler implements RequestHandler<GetFilesListRequest, GetFilesListResponse> {
     @Override
-    public GetFilesListResponse handle(GetFilesListRequest request) {
+    public GetFilesListResponse handle(GetFilesListRequest request, ChannelHandlerContext ctx) {
         String getFilesListRequestpath = request.getPath();
         Path path = Paths.get(getFilesListRequestpath);
         String[] list = path.toFile().list();
