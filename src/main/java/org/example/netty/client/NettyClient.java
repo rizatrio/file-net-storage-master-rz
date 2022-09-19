@@ -12,12 +12,17 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.example.netty.common.dto.GetFilesListRequest;
+import org.example.netty.common.dto.UploadFileRequest;
 
 public class NettyClient {
 
     public static final int MAX_OBJECT_SIZE = 20 * 1_000_000;
+    public static final String TOKEN = "Rizat:123";
 
-    public static void main(String[] args) throws InterruptedException {
+    private final Channel clientChannel;
+
+
+    public NettyClient() {
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup)
@@ -33,12 +38,20 @@ public class NettyClient {
                         );
                     }
                 });
-        ChannelFuture channelFuture = bootstrap.connect().sync();
-        Channel channel = channelFuture.channel();
+        ChannelFuture channelFuture = bootstrap.connect();
+        this.clientChannel = channelFuture.channel();
+    }
 
-        GetFilesListRequest getFilesListRequest = new GetFilesListRequest("Rizat:123", "/");
-        channel.writeAndFlush(getFilesListRequest);
+    public void getFilesList() {
+        GetFilesListRequest getFilesListRequest = new GetFilesListRequest(TOKEN, "/");
+        clientChannel.writeAndFlush(getFilesListRequest);
+    }
 
-        channelFuture.channel().closeFuture().sync();
+    public void uploadFile(UploadFileRequest uploadFileRequest) {
+        try {
+            clientChannel.writeAndFlush(uploadFileRequest).sync();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
